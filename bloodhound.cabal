@@ -76,7 +76,7 @@ test-suite tests
                        errors,
                        exceptions,
                        temporary,
-                       unix,
+                       unix-compat,
                        network-uri
   default-language:    Haskell2010
 

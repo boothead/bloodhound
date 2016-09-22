@@ -46,7 +46,7 @@ import qualified Network.HTTP.Types.Status       as NHTS
 import qualified Network.URI                     as URI
 import           Prelude                         hiding (filter)
 import           System.IO.Temp
-import           System.Posix.Files
+import           System.PosixCompat.Files
 import           Test.Hspec
 import           Test.QuickCheck.Property.Monoid (T (..), eq, prop_Monoid)
 
@@ -575,7 +575,7 @@ instance ApproxEq BoolMatch
 instance ApproxEq MultiMatchQuery
 instance ApproxEq IndexSettings
 instance ApproxEq AllocationPolicy
-instance ApproxEq Char
+instance ApproxEq Char where (=~) = (==)
 instance ApproxEq Vers.Version where
   (=~) = (==)
 instance ApproxEq a => ApproxEq [a] where
