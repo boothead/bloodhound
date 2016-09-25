@@ -32,6 +32,7 @@ library
                        Database.Bloodhound.Common.Types
                        Database.Bloodhound.Common.Types.Class
                        Database.Bloodhound.Common.Types.Internal
+  other-modules:       Database.Bloodhound.Common.Util
   hs-source-dirs:      src
   build-depends:       base             >= 4.3     && <5,
                        bytestring       >= 0.10.0  && <0.11,

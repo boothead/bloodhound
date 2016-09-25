@@ -38,7 +38,9 @@ import           Data.Time.Clock                 (NominalDiffTime, UTCTime (..),
 import           Data.Typeable
 import qualified Data.Vector                     as V
 import qualified Data.Version                    as Vers
-import           Database.Bloodhound
+import           Database.Bloodhound.Common.Types
+import           Database.Bloodhound.Common.Client
+import           Database.Bloodhound.V1.Client   as V1
 import           GHC.Generics                    as G
 import           Network.HTTP.Client             hiding (Proxy)
 import qualified Network.HTTP.Types.Method       as NHTM
@@ -78,14 +80,14 @@ createExampleIndex = createIndex (IndexSettings (ShardCount 1) (ReplicaCount 0))
 deleteExampleIndex :: (MonadBH m) => m Reply
 deleteExampleIndex = deleteIndex testIndex
 
+es11 :: Vers.Version
+es11 = Vers.Version [1, 1, 0] []
+
 es13 :: Vers.Version
 es13 = Vers.Version [1, 3, 0] []
 
 es12 :: Vers.Version
 es12 = Vers.Version [1, 2, 0] []
-
-es11 :: Vers.Version
-es11 = Vers.Version [1, 1, 0] []
 
 es14 :: Vers.Version
 es14 = Vers.Version [1, 4, 0] []
@@ -136,6 +138,9 @@ atleast v = getServerVersion >>= \x -> return $ x >= Just v
 
 atmost :: Vers.Version -> IO Bool
 atmost v = getServerVersion >>= \x -> return $ x <= Just v
+
+under :: Vers.Version -> IO Bool
+under v = getServerVersion >>= \x -> return $ x < Just v
 
 is :: Vers.Version -> IO Bool
 is v = getServerVersion >>= \x -> return $ x == Just v
@@ -1274,7 +1279,7 @@ main = hspec $ do
       _ <- insertData
       let cardinality = CardinalityAgg $ mkCardinalityAggregation $ FieldName "user"
       let search = mkAggregateSearch Nothing $ mkAggregations "users" cardinality
-      let search' = search { Database.Bloodhound.from = From 0, size = Size 0 }
+      let search' = search { Database.Bloodhound.Common.Types.from = From 0, size = Size 0 }
       searchExpectAggs search'
       let docCountPair k n = (k, object ["value" .= Number n])
       res <- searchTweets search'
@@ -1711,6 +1716,12 @@ main = hspec $ do
     it "returns a successful response upon completion" $ withTestEnv $ do
       _ <- createExampleIndex
       resp <- optimizeIndex (IndexList (testIndex :| [])) defaultIndexOptimizationSettings
+      liftIO $ validateStatus resp 200
+  
+  describe "Can delete mapping" $ do
+    it "deletes an existing mapping for < 2.0"  $ when' (under es20) $ withTestEnv $ do
+      _ <- resetIndex
+      resp <- V1.deleteMapping testIndex testMapping
       liftIO $ validateStatus resp 200
 
   describe "JSON instances" $ do

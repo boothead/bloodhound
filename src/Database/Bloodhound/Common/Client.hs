@@ -42,7 +42,6 @@ module Database.Bloodhound.Common.Client
        , deleteTemplate
        -- ** Mapping
        , putMapping
-       , deleteMapping
        -- ** Documents
        , indexDocument
        , updateDocument
@@ -121,6 +120,7 @@ import qualified Network.URI                  as URI
 import           Prelude                      hiding (filter, head)
 
 import           Database.Bloodhound.Common.Types
+import           Database.Bloodhound.Common.Util
 
 -- $setup
 -- >>> :set -XOverloadedStrings
@@ -195,31 +195,6 @@ mkReplicaCount n
   | n > 1000 = Nothing -- ...
   | otherwise = Just (ReplicaCount n)
 
-emptyBody :: L.ByteString
-emptyBody = L.pack ""
-
-dispatch :: MonadBH m
-         => Method
-         -> Text
-         -> Maybe L.ByteString
-         -> m Reply
-dispatch dMethod url body = do
-  initReq <- liftIO $ parseUrl' url
-  reqHook <- bhRequestHook A.<$> getBHEnv
-  let reqBody = RequestBodyLBS $ fromMaybe emptyBody body
-  req <- liftIO $ reqHook $ setRequestIgnoreStatus $ initReq { method = dMethod
-                                                             , requestBody = reqBody }
-  mgr <- bhManager <$> getBHEnv
-  liftIO $ httpLbs req mgr
-
-joinPath' :: [Text] -> Text
-joinPath' = T.intercalate "/"
-
-joinPath :: MonadBH m => [Text] -> m Text
-joinPath ps = do
-  Server s <- bhServer <$> getBHEnv
-  return $ joinPath' (s:ps)
-
 appendSearchTypeParam :: Text -> SearchType -> Text
 appendSearchTypeParam originalUrl st = addQuery params originalUrl
   where stText = "search_type"
@@ -255,17 +230,6 @@ withBH ms s f = do
   let env = mkBHEnv s mgr
   runBH env f
 
--- Shortcut functions for HTTP methods
-delete :: MonadBH m => Text -> m Reply
-delete = flip (dispatch NHTM.methodDelete) Nothing
-get    :: MonadBH m => Text -> m Reply
-get    = flip (dispatch NHTM.methodGet) Nothing
-head   :: MonadBH m => Text -> m Reply
-head   = flip (dispatch NHTM.methodHead) Nothing
-put    :: MonadBH m => Text -> Maybe L.ByteString -> m Reply
-put    = dispatch NHTM.methodPut
-post   :: MonadBH m => Text -> Maybe L.ByteString -> m Reply
-post   = dispatch NHTM.methodPost
 
 -- indexDocument s ix name doc = put (root </> s </> ix </> name </> doc) (Just encode doc)
 -- http://hackage.haskell.org/package/http-client-lens-0.1.0/docs/Network-HTTP-Client-Lens.html
@@ -514,7 +478,7 @@ createIndex indexSettings (IndexName indexName) =
 -- >>> response <- runBH' $ deleteIndex (IndexName "didimakeanindex")
 -- >>> respIsTwoHunna response
 -- True
--- >>> runBH' $ indexExists testIndex
+-- >>> runBH' $ indexExists (IndexName "didimakeanindex")
 -- False
 deleteIndex :: MonadBH m => IndexName -> m Reply
 deleteIndex (IndexName indexName) =
@@ -747,21 +711,6 @@ putMapping (IndexName indexName) (MappingName mappingName) mapping =
         -- "_mapping" and mappingName above were originally transposed
         -- erroneously. The correct API call is: "/INDEX/_mapping/MAPPING_NAME"
         body = Just $ encode mapping
-
--- | 'deleteMapping' is an HTTP DELETE and deletes a mapping for a given index.
--- Mappings are schemas for documents in indexes.
---
--- >>> _ <- runBH' $ createIndex defaultIndexSettings testIndex
--- >>> _ <- runBH' $ putMapping testIndex testMapping TweetMapping
--- >>> resp <- runBH' $ deleteMapping testIndex testMapping
--- >>> print resp
--- Response {responseStatus = Status {statusCode = 200, statusMessage = "OK"}, responseVersion = HTTP/1.1, responseHeaders = [("Content-Type","application/json; charset=UTF-8"),("Content-Length","21")], responseBody = "{\"acknowledged\":true}", responseCookieJar = CJ {expose = []}, responseClose' = ResponseClose}
-deleteMapping :: MonadBH m => IndexName -> MappingName -> m Reply
-deleteMapping (IndexName indexName)
-  (MappingName mappingName) =
-  -- "_mapping" and mappingName below were originally transposed
-  -- erroneously. The correct API call is: "/INDEX/_mapping/MAPPING_NAME"
-  delete =<< joinPath [indexName, "_mapping", mappingName]
 
 versionCtlParams :: IndexDocumentSettings -> [(Text, Maybe Text)]
 versionCtlParams cfg =
@@ -1055,9 +1004,6 @@ pageSearch :: From     -- ^ The result offset
            -> Search  -- ^ The current seach
            -> Search  -- ^ The paged search
 pageSearch resultOffset pageSize search = search { from = resultOffset, size = pageSize }
-
-parseUrl' :: MonadThrow m => Text -> m Request
-parseUrl' t = parseRequest (URI.escapeURIString URI.isAllowedInURI (T.unpack t))
 
 -- | Was there an optimistic concurrency control conflict when
 -- indexing a document?

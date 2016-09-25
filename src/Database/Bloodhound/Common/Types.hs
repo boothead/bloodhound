@@ -399,6 +399,7 @@ import qualified Text.Read                          as TR
 
 import           Database.Bloodhound.Common.Types.Class
 import           Database.Bloodhound.Common.Types.Internal
+import           Database.Bloodhound.Common.Util
 
 -- $setup
 -- >>> :set -XOverloadedStrings
@@ -629,10 +630,6 @@ data IndexSettingsSummary = IndexSettingsSummary { sSummaryIndexName     :: Inde
                                                  , sSummaryFixedSettings :: IndexSettings
                                                  , sSummaryUpdateable    :: [UpdatableIndexSetting]}
                                                  deriving (Eq, Show, Generic, Typeable)
-
-{-| 'Reply' and 'Method' are type synonyms from 'Network.HTTP.Types.Method.Method' -}
-type Reply = Network.HTTP.Client.Response L.ByteString
-type Method = NHTM.Method
 
 {-| 'OpenCloseIndex' is a sum type for opening and closing indices.
 
