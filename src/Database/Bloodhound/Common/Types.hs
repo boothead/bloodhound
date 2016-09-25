@@ -12,7 +12,7 @@
 
 -------------------------------------------------------------------------------
 -- |
--- Module : Database.Bloodhound.Types
+-- Module : Database.Bloodhound.Common.Types
 -- Copyright : (C) 2014, 2015, 2016 Chris Allen
 -- License : BSD-style (see the file LICENSE)
 -- Maintainer : Chris Allen <cma@bitemyapp.com
@@ -29,7 +29,7 @@
 
 
 
-module Database.Bloodhound.Types
+module Database.Bloodhound.Common.Types
        ( defaultCache
        , defaultIndexSettings
        , defaultIndexDocumentSettings
@@ -397,8 +397,8 @@ import qualified Network.HTTP.Types.Method          as NHTM
 import qualified Text.ParserCombinators.ReadP       as RP
 import qualified Text.Read                          as TR
 
-import           Database.Bloodhound.Types.Class
-import           Database.Bloodhound.Types.Internal
+import           Database.Bloodhound.Common.Types.Class
+import           Database.Bloodhound.Common.Types.Internal
 
 -- $setup
 -- >>> :set -XOverloadedStrings

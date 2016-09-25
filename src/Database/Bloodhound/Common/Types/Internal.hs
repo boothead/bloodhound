@@ -5,7 +5,7 @@
 
 -------------------------------------------------------------------------------
 -- |
--- Module : Database.Bloodhound.Types.Internal
+-- Module : Database.Bloodhound.Common.Types.Internal
 -- Copyright : (C) 2014 Chris Allen
 -- License : BSD-style (see the file LICENSE)
 -- Maintainer : Chris Allen <cma@bitemyapp.com>
@@ -15,7 +15,7 @@
 -- Internal data types for Bloodhound. These types may change without
 -- notice so import at your own risk.
 -------------------------------------------------------------------------------
-module Database.Bloodhound.Types.Internal
+module Database.Bloodhound.Common.Types.Internal
     ( BHEnv(..)
     , Server(..)
     , MonadBH(..)

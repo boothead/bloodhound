@@ -24,10 +24,14 @@ source-repository head
 library
   ghc-options: -Wall
   exposed-modules:     Database.Bloodhound
-                       Database.Bloodhound.Client
-                       Database.Bloodhound.Types
-                       Database.Bloodhound.Types.Class
-                       Database.Bloodhound.Types.Internal
+                       Database.Bloodhound.V1.Client
+                       Database.Bloodhound.V1.Types
+                       Database.Bloodhound.V2.Client
+                       Database.Bloodhound.V2.Types
+                       Database.Bloodhound.Common.Client
+                       Database.Bloodhound.Common.Types
+                       Database.Bloodhound.Common.Types.Class
+                       Database.Bloodhound.Common.Types.Internal
   hs-source-dirs:      src
   build-depends:       base             >= 4.3     && <5,
                        bytestring       >= 0.10.0  && <0.11,

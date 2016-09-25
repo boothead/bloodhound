@@ -1,5 +1,5 @@
 {-# LANGUAGE CPP #-}
-module Database.Bloodhound.Types.Class
+module Database.Bloodhound.Common.Types.Class
        ( Seminearring(..) )
        where
 

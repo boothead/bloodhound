@@ -4,7 +4,7 @@
 
 -------------------------------------------------------------------------------
 -- |
--- Module : Database.Bloodhound.Client
+-- Module : Database.Bloodhound.Common.Client
 -- Copyright : (C) 2014 Chris Allen
 -- License : BSD-style (see the file LICENSE)
 -- Maintainer : Chris Allen <cma@bitemyapp.com
@@ -15,7 +15,7 @@
 --
 -------------------------------------------------------------------------------
 
-module Database.Bloodhound.Client
+module Database.Bloodhound.Common.Client
        ( -- * Bloodhound client functions
          -- | The examples in this module assume the following code has been run.
          --   The :{ and :} will only work in GHCi. You'll only need the data types
@@ -120,7 +120,7 @@ import qualified Network.HTTP.Types.URI       as NHTU
 import qualified Network.URI                  as URI
 import           Prelude                      hiding (filter, head)
 
-import           Database.Bloodhound.Types
+import           Database.Bloodhound.Common.Types
 
 -- $setup
 -- >>> :set -XOverloadedStrings
