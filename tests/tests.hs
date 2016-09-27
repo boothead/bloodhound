@@ -1136,7 +1136,7 @@ main = hspec $ do
     it "returns document for geo boundingbox filter" $ withTestEnv $ do
       _ <- insertData
       let box = GeoBoundingBox (LatLon 40.73 (-74.1)) (LatLon 40.10 (-71.12))
-      let bbConstraint = GeoBoundingBoxConstraint (FieldName "tweet.location") box False GeoFilterMemory
+      let bbConstraint = GeoBoundingBoxConstraint (FieldName "location") box GeoFilterMemory
       let geoFilter = GeoBoundingBoxFilter bbConstraint
       let search = mkSearch Nothing (Just geoFilter)
       myTweet <- searchTweet search
@@ -1146,14 +1146,14 @@ main = hspec $ do
     it "doesn't return document for nonsensical boundingbox filter" $ withTestEnv $ do
       _ <- insertData
       let box          = GeoBoundingBox (LatLon 0.73 (-4.1)) (LatLon 0.10 (-1.12))
-      let bbConstraint = GeoBoundingBoxConstraint (FieldName "tweet.location") box False GeoFilterMemory
+      let bbConstraint = GeoBoundingBoxConstraint (FieldName "location") box GeoFilterMemory
       let geoFilter    = GeoBoundingBoxFilter bbConstraint
       let search       = mkSearch Nothing (Just geoFilter)
       searchExpectNoResults search
 
     it "returns document for geo distance filter" $ withTestEnv $ do
       _ <- insertData
-      let geoPoint = GeoPoint (FieldName "tweet.location") (LatLon 40.12 (-71.34))
+      let geoPoint = GeoPoint (FieldName "location") (LatLon 40.12 (-71.34))
       let distance = Distance 10.0 Miles
       let optimizeBbox = OptimizeGeoFilterType GeoFilterMemory
       let geoFilter = GeoDistanceFilter geoPoint distance SloppyArc optimizeBbox False
@@ -1164,7 +1164,7 @@ main = hspec $ do
 
     it "returns document for geo distance range filter" $ withTestEnv $ do
       _ <- insertData
-      let geoPoint = GeoPoint (FieldName "tweet.location") (LatLon 40.12 (-71.34))
+      let geoPoint = GeoPoint (FieldName "location") (LatLon 40.12 (-71.34))
       let distanceRange = DistanceRange (Distance 0.0 Miles) (Distance 10.0 Miles)
       let geoFilter = GeoDistanceRangeFilter geoPoint distanceRange
       let search = mkSearch Nothing (Just geoFilter)
@@ -1174,7 +1174,7 @@ main = hspec $ do
 
     it "doesn't return document for wild geo distance range filter" $ withTestEnv $ do
       _ <- insertData
-      let geoPoint = GeoPoint (FieldName "tweet.location") (LatLon 40.12 (-71.34))
+      let geoPoint = GeoPoint (FieldName "location") (LatLon 40.12 (-71.34))
       let distanceRange = DistanceRange (Distance 100.0 Miles) (Distance 1000.0 Miles)
       let geoFilter = GeoDistanceRangeFilter geoPoint distanceRange
       let search = mkSearch Nothing (Just geoFilter)
@@ -1186,7 +1186,7 @@ main = hspec $ do
                     LatLon 40.0 (-72.00),
                     LatLon 41.0 (-70.00),
                     LatLon 41.0 (-72.00)]
-      let geoFilter = GeoPolygonFilter (FieldName "tweet.location") points
+      let geoFilter = GeoPolygonFilter (FieldName "location") points
       let search = mkSearch Nothing (Just geoFilter)
       myTweet <- searchTweet search
       liftIO $
@@ -1198,7 +1198,7 @@ main = hspec $ do
                     LatLon 40.0 (-71.00),
                     LatLon 41.0 (-70.00),
                     LatLon 41.0 (-71.00)]
-      let geoFilter = GeoPolygonFilter (FieldName "tweet.location") points
+      let geoFilter = GeoPolygonFilter (FieldName "location") points
       let search = mkSearch Nothing (Just geoFilter)
       searchExpectNoResults search
 
